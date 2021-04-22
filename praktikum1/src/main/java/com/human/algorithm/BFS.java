@@ -38,6 +38,7 @@ public abstract class BFS {
 		{
 			// Man hole den ersten hinzugefügten Knoten
 			OwnNode current = toVisitNodes.poll();
+			if(!visitedNodes.contains(current)) {
 			// Man schaue seine Kanten an
 			current.realEdges()
 				// und besuchen seinen Nachbarn (kann auch schon als besucht markiert sein,
@@ -51,6 +52,7 @@ public abstract class BFS {
 				.forEach(unvisitedNode -> toVisitNodes.add((OwnNode) unvisitedNode));
 			// Jetzt markieren wir den aktuellen Knoten als besucht! 
 			visitedNodes.add(current);
+			}
 		}
 	}
 }

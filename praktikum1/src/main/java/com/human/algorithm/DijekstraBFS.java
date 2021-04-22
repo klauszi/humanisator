@@ -21,13 +21,8 @@ public class DijekstraBFS extends BFS implements ShortestPath{
 
 	@Override
 	protected void visit(OwnNode source, OwnEdge usedEdge) {
-		OwnNode visitedNode;
-		if(usedEdge.getNode0().equals(source)) {
-			visitedNode = usedEdge.getNode1();
-		}
-		else {
-			visitedNode = usedEdge.getNode0();
-		}
+		OwnNode visitedNode = usedEdge.getAnotherNode(source);
+
 		int oldValue = (int) visitedNode.getAttribute(DIST);
 		int preValue = (int) source.getAttribute(DIST);
 		int weight = (int) usedEdge.getAttribute("weight");

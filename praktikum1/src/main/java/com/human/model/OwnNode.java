@@ -24,7 +24,7 @@ public class OwnNode extends MultiNode implements Node{
 	}
 	
 	public Stream<OwnEdge> realEdges(){
-		return super.edges().map(e -> (OwnEdge) e).filter(e -> !ishidden(e));
+		return leavingEdges().map(e -> (OwnEdge) e).filter(e -> !ishidden(e));
 	}
 
 	private boolean ishidden(Edge e) {
