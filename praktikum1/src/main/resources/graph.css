@@ -1,0 +1,48 @@
+graph {
+	fill-color: black;
+	}
+
+node {
+	text-size: 15px;
+	text-alignment: center;
+	size: 35px;
+	text-background-mode: plain;
+	text-background-color: #EB2;
+	text-color: #222;
+	shape: circle;
+	fill-color: #EB2; }
+	
+node.source {
+	text-size: 15px;
+	text-alignment: center;
+	size: 35px;
+	text-background-mode: plain;
+	text-background-color: red;
+	text-color: #222;
+	shape: circle;
+	fill-color: red; }
+	
+node.target {
+	text-size: 15px;
+	text-alignment: center;
+	size: 35px;
+	text-background-mode: plain;
+	text-background-color: green;
+	text-color: #222;
+	shape: circle;
+	fill-color: green; }
+
+edge {
+	fill-color:grey;
+	arrow-size: 20px, 15px;
+	arrow-shape: arrow;
+	size-mode: dyn-size;
+	fill-mode: dyn-plain;
+	size: 2px;
+	text-mode: normal;
+	text-size: 15px;
+	text-alignment: along;
+	text-background-mode: plain;
+	text-padding: 5px;
+	text-background-color: grey;
+	text-color: #222; }
