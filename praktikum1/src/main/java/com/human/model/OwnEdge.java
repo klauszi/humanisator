@@ -39,23 +39,4 @@ public class OwnEdge extends AbstractEdge implements Edge, IOwnEdge{
 			return sourceName + edgeType + targetName;
 		}
 	}
-	
-	public OwnNode getNode0() {
-		return (OwnNode) super.getNode0();
-	}
-
-	public OwnNode getNode1() {
-		return (OwnNode) super.getNode1();
-	}
-
-	public OwnNode getAnotherNode(OwnNode node) {
-		OwnNode n1 = this.getNode1();
-		OwnNode n2 = this.getNode0();
-		if(node.equals(n2)) {
-			return n1;
-		}
-		else {
-			return n2;
-		}
-	}
 }

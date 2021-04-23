@@ -41,11 +41,11 @@ public abstract class BFS {
 			if(!visitedNodes.contains(current)) {
 			// Man schaue seine Kanten an
 			current.realEdges()
-				// und besuchen seinen Nachbarn (kann auch schon als besucht markiert sein,
-				// weil andere oder ungerichtete Kante),
+				// und besucht seine Nachbarn (kann auch schon als besucht markiert sein,
+				// weil andere oder ungerichtete Kante vorliegt),
 				.peek(e -> visit(current, e))
 				// jetzt wollen wir den Nachbarn genauer anschauen
-				.map(e -> e.getAnotherNode(current))
+				.map(e -> e.getOpposite(current))
 				// Falls der Nachbar noch nie besucht worden ist,
 				.filter(n -> !visitedNodes.contains(n))
 				// dann müssen wir ihn in Zukunft besuchen! 
