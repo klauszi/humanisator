@@ -19,8 +19,13 @@ import com.human.algorithm.ShortestPath;
 import com.human.model.OwnEdge;
 import com.human.model.OwnGraph;
 import com.human.model.OwnNode;
+import com.human.view.GKAChooser;
 import com.human.view.GraphView;
 
+/**
+ * @author ziegert
+ *
+ */
 public class GraphController implements ActionListener{
 	
 	private GraphView view;
@@ -34,8 +39,8 @@ public class GraphController implements ActionListener{
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		Component clickedComponent = (Component) arg0.getSource();
+	public void actionPerformed(ActionEvent event) {
+		Component clickedComponent = (Component) event.getSource();
 		System.out.println(clickedComponent);
 		if(clickedComponent == view.getSaveItem()) {
 			save();
@@ -57,11 +62,18 @@ public class GraphController implements ActionListener{
 		}
 	}
 	
+	/**
+	 * Berechnet den kürzesten Pfad, färbt den Pfad und setzt
+	 * die Anzahl der genutzten Pfade
+	 */
 	public void start() {
+		// kürzesten Pfad von Quelle zum Zielknoten bestimmen
 		OwnNode source = (OwnNode) view.getSourceNode();
 		OwnNode target = (OwnNode) view.getTargetNode();
 		shortestPath.run(source);
 		Path path = shortestPath.getShortestPath(target);
+		
+		//Anzahl der Kanten setzen
 		int numberOfEdges = path.getEdgeCount();
 		String numberOfEdgesPrint;
 		if(numberOfEdges == 0 && target != source) {
@@ -71,75 +83,55 @@ public class GraphController implements ActionListener{
 			numberOfEdgesPrint = String.valueOf(numberOfEdges);
 		}
 		view.getNumberEdges().setText(numberOfEdgesPrint);
+
+		//Pfad färben
 		view.colorPath(path);
 	}
 
+	/**
+	 * Aktualisert den Zielknoten  und färbt diesen entsprechend.
+	 */
 	public void target() {
 		String targetId = (String) view.getTarget().getSelectedItem();
 		view.uncolorEdges();
 		view.setTargetNode(targetId);
 	}
 
+	/**
+	 * Aktualisert die Quelle und färbt diesen entsprechend.
+	 */
 	public void source() {
 		String sourceId = (String) view.getSource().getSelectedItem();
 		view.uncolorEdges();
 		view.setSourceNode(sourceId);
 	}
 	
+	/**
+	 *  Öffnet eine Dateiauswahlfenster und speichert
+	 *  den aktuellen Graphen in die Auswahl.
+	 */
 	public void save() {
-            JFileChooser chooser = new JFileChooser();
-            int userSelection = chooser.showSaveDialog(view);
-            
-            // wir wollen nur GKA Dokumente
-            chooser.setAcceptAllFileFilterUsed(false);
-            chooser.addChoosableFileFilter(new FileFilter() {
-                public String getDescription() {
-                    return "GKA Documents (*.gka)";
-                }
-
-                public boolean accept(File f) {
-                    if (f.isDirectory()) {
-                        return true;
-                    } else {
-                        return f.getName().toLowerCase().endsWith(".gka");
-                    }
-                }
-            });
-            
-            // Schreib die Auswahl raus
-            if(userSelection == JFileChooser.APPROVE_OPTION) {
-            	File file = chooser.getSelectedFile();
-            	FileWriter writer;
-				try {
-					writer = new FileWriter(file);
-					writer.write(graph.toString());
-					writer.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-            }
+		JFileChooser chooser = new GKAChooser();
+        int userSelection = chooser.showOpenDialog(null);
+        if(userSelection == JFileChooser.APPROVE_OPTION) {
+           	File file = chooser.getSelectedFile();
+           	FileWriter writer;
+			try {
+				writer = new FileWriter(file);
+				writer.write(graph.toString());
+				writer.close();}
+			catch (IOException e1) {
+				e1.printStackTrace();
+			}
+        }
 	}
 	
 	/**
-	 *  Öffnet ein Dateiauswahlfenster und lädt aus der ausgewählten Datei
-	 *  den entsprechenden Graphen.
+	 *  Öffnet eine Dateiauswahlfenster und ladet 
+	 *  den neuen Graphen in die View.
 	 */
 	public void load() {
-            JFileChooser chooser = new JFileChooser();
-            chooser.setAcceptAllFileFilterUsed(false);
-            chooser.addChoosableFileFilter(new FileFilter() {
-                public String getDescription() {
-                    return "GKA Documents (*.gka)";
-                }
-             
-                public boolean accept(File f) {
-                    if (f.isDirectory()) {
-                        return true;
-                    } else {
-                        return f.getName().toLowerCase().endsWith(".gka");
-                    }
-                }
-            });
+			JFileChooser chooser = new GKAChooser();
             int chooserValue = chooser.showOpenDialog(null);
             if(chooserValue == JFileChooser.APPROVE_OPTION) {
             	File file = chooser.getSelectedFile();
