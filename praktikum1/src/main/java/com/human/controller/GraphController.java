@@ -120,6 +120,10 @@ public class GraphController implements ActionListener{
             }
 	}
 	
+	/**
+	 *  Öffnet ein Dateiauswahlfenster und lädt aus der ausgewählten Datei
+	 *  den entsprechenden Graphen.
+	 */
 	public void load() {
             JFileChooser chooser = new JFileChooser();
             chooser.setAcceptAllFileFilterUsed(false);
