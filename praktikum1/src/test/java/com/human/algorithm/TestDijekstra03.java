@@ -17,8 +17,8 @@ import com.human.model.OwnEdge;
 import com.human.model.OwnGraph;
 import com.human.model.OwnNode;
 
-public class Graph02 {
-	OwnGraph graph02;
+public class TestDijekstra03 {
+	OwnGraph graph03;
 	ShortestPath shortestPath;
 
 	@BeforeClass
@@ -32,7 +32,7 @@ public class Graph02 {
 	@Before
 	public void setUp() throws Exception {
 		File file = new File("");
-		String fileName = "graph02.gka";
+		String fileName = "graph03.gka";
 		try {
 		    ClassLoader classLoader = App.class.getClassLoader();
 		    file = new File(classLoader.getResource(fileName).getFile());
@@ -40,8 +40,8 @@ public class Graph02 {
 		catch (Exception e) {
 			System.out.println("graph01.gka cannot found!");
 		}
-		graph02 = OwnGraph.getInstanceFromFile(file);
-		shortestPath = new DijekstraBFS(graph02);
+		graph03 = OwnGraph.getInstanceFromFile(file);
+		shortestPath = new DijekstraBFS(graph03);
 	}
 
 	@After
@@ -51,21 +51,21 @@ public class Graph02 {
 	//Testet ob der Graph zusammenhängend ist.
 	@Test
 	public void completeConnectedTest() {
-		this.graph02.realNodes().forEach(
+		this.graph03.realNodes().forEach(
 				n -> {
 					shortestPath.run(n);
-					boolean reachable = this.graph02.realNodes()
+					boolean reachable = this.graph03.realNodes()
 							.filter(a -> !n.equals(a))
 							.allMatch(a -> shortestPath.getShortestPath(a).size() > 0);
 					assertTrue(reachable);
 					});
 	}
 
-	//Testet ob a und j dieselbe Kante als kürzesten Pfad nutzen.
+	//Testet ob Soltau und Rotenburg dieselbe Kante als kürzesten Pfad nutzen.
 	@Test
 	public void UseSameUndirectedEdgeTest() {
-		OwnNode a = this.graph02.getNode("a");
-		OwnNode j = this.graph02.getNode("j");
+		OwnNode a = this.graph03.getNode("Soltau");
+		OwnNode j = this.graph03.getNode("Rotenburg");
 
 		//a -> j
 		shortestPath.run(a);
@@ -78,22 +78,17 @@ public class Graph02 {
 		assertEquals(path1.getEdgePath(), path2.getEdgePath());
 	}
 
-	// Da alle Kanten ungerichtet sind und der Graph zusammenhängend ist,
-	// ist der kürzeste Pfad von a -> b genauso lang wie von b -> a.
-	// Da es mehrere kürzeste Pfade gibt, wird es hier anhand der Länge bestimmt.
+	//Testet ob von Husum nach Rotenburg auch Kiel enthalten ist.
 	@Test
-	public void UseUndirectedEdgeTest() {
-		this.graph02.realNodes().forEach(
-				n -> {
-					this.graph02.realNodes()
-							.filter(a -> !n.equals(a))
-							.forEach(a ->{
-									shortestPath.run(n);
-									Path path1 = shortestPath.getShortestPath(a);
-									shortestPath.run(a);
-									Path path2 = shortestPath.getShortestPath(n);
-									assertEquals(path1.getEdgeCount(), path2.getEdgeCount());
-							});
-					});
+	public void BetweenNodeTest() {
+		OwnNode bh = this.graph03.getNode("Husum");
+		OwnNode h = this.graph03.getNode("Rotenburg");
+
+		//(Husum -> Kiel -> Uelzen -> Rotenburg) ist kürzer als
+		//(Husum -> Norderstedt -> Bremerhaven -> Rotenburg)
+		shortestPath.run(bh);
+		Path path = shortestPath.getShortestPath(h);
+		long c = path.getNodePath().stream().filter(n -> n.getId().contentEquals("Kiel")).count();
+		assertTrue(c == 1);
 	}
 }

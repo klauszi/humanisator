@@ -17,7 +17,7 @@ import com.human.model.OwnEdge;
 import com.human.model.OwnGraph;
 import com.human.model.OwnNode;
 
-public class Graph01 {
+public class TestDijekstra01 {
 	OwnGraph graph01;
 	ShortestPath shortestPath;
 
