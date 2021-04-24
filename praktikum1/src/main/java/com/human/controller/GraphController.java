@@ -41,7 +41,6 @@ public class GraphController implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		Component clickedComponent = (Component) event.getSource();
-		System.out.println(clickedComponent);
 		if(clickedComponent == view.getSaveItem()) {
 			save();
 		}
@@ -112,7 +111,7 @@ public class GraphController implements ActionListener{
 	 */
 	public void save() {
 		JFileChooser chooser = new GKAChooser();
-        int userSelection = chooser.showOpenDialog(null);
+        int userSelection = chooser.showSaveDialog(null);
         if(userSelection == JFileChooser.APPROVE_OPTION) {
            	File file = chooser.getSelectedFile();
            	FileWriter writer;
