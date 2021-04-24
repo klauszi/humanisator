@@ -205,7 +205,7 @@ public class GraphView extends JFrame{
         JPanel alg2 = new JPanel();
 
         alg.setLayout(new BoxLayout(alg, BoxLayout.PAGE_AXIS));
-        JLabel title = new JLabel ("Dijekstra", SwingConstants.LEFT);
+        JLabel title = new JLabel ("Dijkstra", SwingConstants.LEFT);
         title.setFont (title.getFont ().deriveFont (32.0f));
         alg1.add(title);
 
