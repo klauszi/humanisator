@@ -145,7 +145,6 @@ public class OwnGraph extends MultiGraph {
 		}
 	}
 
-	// TODO auslagen. z.B. durch read(line); 
 	// liefert eine neue Instanz durch Angabe einer Datei
 	public static OwnGraph getInstanceFromFile(File file) {
 		String fileName = file.getName();
