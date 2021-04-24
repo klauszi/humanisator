@@ -1,7 +1,13 @@
 package com.human.model;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -24,6 +30,15 @@ public class OwnGraph extends MultiGraph {
 	static Pattern nodePattern = Pattern.compile(NODEREG);
 	static Pattern edgePattern = Pattern.compile(EDGEREG);
 	
+	// Gibt für ein Attribut die entsprechende GroupId der Pattern zum Nachschlagen zurück.  
+	static Map<String, Integer> ATTR2GROUP = Stream.of(new Object[][] {
+		{"from", 1},
+		{"edgeType", 2},
+		{"to", 3},
+		{"edgeName", 5},
+		{"weight", 7},
+	}).collect(Collectors.toMap(data -> (String) data[0], data -> (Integer) data[1]));
+	
 	static private int edgeId = 0;
 	
 	// EmptyNode, um Zusammenhängigkeit  zu garantieren
@@ -31,7 +46,7 @@ public class OwnGraph extends MultiGraph {
 	private OwnNode emptyNode;
 
 	// Instanziierung mithilfe vom Konstruktor wird vermieden,
-	// um ungünstige Überladdung zu vermeiden.
+	// um ungünstige Überladung zu vermeiden.
 	private OwnGraph(String id) {
 		super(id);
 
@@ -49,9 +64,87 @@ public class OwnGraph extends MultiGraph {
 			}
 		});
 
+		//Verstecke den leeren Knoten
 		emptyNode = (OwnNode) super.addNode("EMPTY");
 		emptyNode.setAttribute("ui.hide");
 	}
+	
+
+	/**
+	 * Liest eine Zeile. Liefert ein Map zurück, der für jedes Attribut den
+	 * entsprechend gelesenen Wert angibt. Falls die Zeile nicht zum Pattern passt,
+	 * wird ein leeres Map zurückgegeben.
+	 * @param line
+	 * @return Attribute
+	 */
+	static private Map<String, String> readValuesFromLine(String line){
+		Matcher nodeMatcher = nodePattern.matcher(line);
+		Matcher edgeMatcher = edgePattern.matcher(line);
+		Map<String, String>	attr =  new HashMap<String, String>();
+
+		if(edgeMatcher.find()) {
+			attr = ATTR2GROUP.keySet()
+					.stream()
+					.collect(Collectors.toMap(
+						key -> key,
+						key -> (String) Optional.ofNullable(edgeMatcher.group(ATTR2GROUP.get(key))).orElse("null")));
+		}
+		else if(nodeMatcher.find()) {
+			String key = "from";
+			String nodeName = nodeMatcher.group(ATTR2GROUP.get(key));
+			attr.put(key, nodeName);
+		}
+		return attr;
+	}
+	
+	/**
+	 * Fügt einen Element abhängig von den gesetzten Attributen und Werten hinzu
+	 * @param graph
+	 * @param attrToValue Attribute und zugehörige Werte
+	 * @return
+	 */
+	static private boolean addElement(OwnGraph graph, Map<String, String> attrToValue)
+	{
+		//gültige Keys
+		Set<String> EdgeKeys = ATTR2GROUP.keySet();
+		Set<String> NodeKeys = new HashSet<String>(Arrays.asList("from"));
+		
+		//Überprüfung auf Gültigkeit
+		boolean validEdgeKeys = attrToValue.keySet().equals(ATTR2GROUP.keySet());
+		boolean validNodeKeys = attrToValue.keySet().equals(NodeKeys);
+		
+		
+		if(validEdgeKeys){
+			//Daten aus der Map auslesen
+			String from = attrToValue.get("from");
+			String edgeType = attrToValue.get("edgeType");
+			String to = attrToValue.get("to");
+			String edgeName = attrToValue.get("edgeName");
+			String weight = attrToValue.get("weight");
+
+			int weightValue = weight == "null"? 1 : Integer.valueOf(weight);
+			boolean directed = edgeType.equals("->");
+
+			Edge edge = graph.addEdge(from, to, directed, weightValue);
+			if(edgeName == "null") {
+				edge.setAttribute("ui.label", "(" + edge.getId() + ")" + "W" + weightValue);
+			}
+			else {
+				edge.setAttribute("ui.label", edgeName.trim() + "W" + weightValue);
+				edge.setAttribute("hasLabel", true);
+			}
+			return true;
+		}
+		else if(validNodeKeys) {
+			String nodeName = attrToValue.get("from");
+			graph.addNode(nodeName);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	// TODO auslagen. z.B. durch read(line); 
 	// liefert eine neue Instanz durch Angabe einer Datei
 	public static OwnGraph getInstanceFromFile(File file) {
@@ -61,43 +154,9 @@ public class OwnGraph extends MultiGraph {
 			Scanner in = new Scanner(file);
 			while(in.hasNext()) {
 				String line = in.nextLine();
-				Matcher nodeMatcher = nodePattern.matcher(line);
-				Matcher edgeMatcher = edgePattern.matcher(line);
-				if(edgeMatcher.find()) {
-					String from = edgeMatcher.group(1);
-					String edgeType = edgeMatcher.group(2);
-					String to = edgeMatcher.group(3);
-					String edgeName = edgeMatcher.group(5);
-					String weight = edgeMatcher.group(7);
-					int weightValue;
-					if(weight != null) {
-						weightValue = Integer.valueOf(weight);
-					}
-					else {
-						weightValue = 1;
-					}
-					Edge edge;
-					if (edgeType.equals("->")) {
-						edge = graph.addDirectedEdge(from, to, weightValue);
-					}
-					else {
-						edge = graph.addUndirectedEdge(from, to, weightValue);
-					}
-					if(edgeName != null) {
-						edge.setAttribute("ui.label", edgeName.trim() + "W" + weightValue);
-						edge.setAttribute("hasLabel", true);
-					}
-					else {
-						edge.setAttribute("ui.label", "(" + edge.getId() + ")" + "W" + weightValue);
-					}
-
-				}
-				else if(nodeMatcher.find())
-				{
-					String nodeName = nodeMatcher.group(1);
-					graph.addNode(nodeName);
-				}
-				else {
+				Map<String, String> attrToValues = readValuesFromLine(line);
+				boolean succeed = addElement(graph, attrToValues);
+				if(!succeed){
 					System.out.println("no match: " + line);
 				}
 			}
@@ -118,33 +177,20 @@ public class OwnGraph extends MultiGraph {
 		OwnNode node = getNode(id);
 		if(node == null) {
 			node = (OwnNode) super.addNode(id);
-
-			// TODO: In die GUI auslagern, weil eher Design
-			// Erzeugt eine versteckte Kante, damit der Graph zusammenhängt bleibt,
-			// weil Autolayout ansonsten die Knoten ungüngstig verteilt.
-			Edge edge = addUndirectedEdge(node.getId(), emptyNode.getId(), 0);
+			Edge edge = addEdge(node.getId(), emptyNode.getId(), false, 0);
 			edge.setAttribute("ui.hide");
 			}
-		// TODO: In die GUI auslagern, weil eher Design
-		node.setAttribute("ui.label", id);
+		else {
+			node.setAttribute("ui.label", id);
+		}
 		return node;
 	}
 	
-	public OwnEdge addDirectedEdge(String from, String to, int weight) {
+	public OwnEdge addEdge(String from, String to, boolean directed, int weight) {
 		OwnNode source, target;
 		source = this.addNode(from);
 		target = this.addNode(to);
-		OwnEdge edge = (OwnEdge) addEdge(String.valueOf(edgeId), source, target, true);
-		edge.setAttribute("weight", weight);
-		edgeId += 1;
-		return edge;
-	}
-
-	public OwnEdge addUndirectedEdge(String from, String to, int weight) {
-		OwnNode source, target;
-		source = this.addNode(from);
-		target = this.addNode(to);
-		OwnEdge edge = (OwnEdge) addEdge(String.valueOf(edgeId), source, target, false);
+		OwnEdge edge = (OwnEdge) addEdge(String.valueOf(edgeId), source, target, directed);
 		edge.setAttribute("weight", weight);
 		edgeId += 1;
 		return edge;
@@ -161,7 +207,6 @@ public class OwnGraph extends MultiGraph {
 	}
 	
 	//toString entspricht Speicherformat
-	//TODO: implementieren
 	@Override
 	public String toString() {
 		String printnodes = realNodes().map(n -> n.toString() + "\n").collect(Collectors.joining());
