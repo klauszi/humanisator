@@ -84,11 +84,11 @@ public class OwnGraph extends MultiGraph {
 						edge = graph.addUndirectedEdge(from, to, weightValue);
 					}
 					if(edgeName != null) {
-						edge.setAttribute("ui.label", edgeName.trim());
+						edge.setAttribute("ui.label", edgeName.trim() + "W" + weightValue);
 						edge.setAttribute("hasLabel", true);
 					}
 					else {
-						edge.setAttribute("ui.label", "(" + edge.getId() + ")");
+						edge.setAttribute("ui.label", "(" + edge.getId() + ")" + "W" + weightValue);
 					}
 
 				}
@@ -109,8 +109,10 @@ public class OwnGraph extends MultiGraph {
 		return graph;
 	}
 	
-	// Fügt ggf. einen neuen Knoten hinzu
-	// Ein Knoten mit id wird garantiert zurückgegeben.
+	/**
+	 * Fügt, falls nicht vorhanden, einen Knoten hinzu ung gibt
+	 * den Knoten mit der Id garantiert zurück. 
+	 */
 	@Override
 	public OwnNode addNode(String id) {
 		OwnNode node = getNode(id);
