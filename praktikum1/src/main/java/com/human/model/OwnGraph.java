@@ -24,15 +24,15 @@ import org.graphstream.graph.implementations.AbstractNode;
 
 public class OwnGraph extends MultiGraph {
 	
-	static String NODEREG = "^(?<nodeName>[\\w�]+);$";
-	static String EDGEREG = "^(?<from>[\\w�]+) "
+	private String NODEREG = "^(?<nodeName>[\\w�]+);$";
+	private String EDGEREG = "^(?<from>[\\w�]+) "
 			+ "(?<edgeType>->||--) "
 			+ "(?<to>[\\w�]+)"
 			+ "(?<edgeName> \\(([\\w�]+)\\))?"
 			+ "( : (?<weight>\\d+))?;$";
 
-	static Pattern nodePattern = Pattern.compile(NODEREG);
-	static Pattern edgePattern = Pattern.compile(EDGEREG);
+	private Pattern nodePattern = Pattern.compile(NODEREG);
+	private Pattern edgePattern = Pattern.compile(EDGEREG);
 	
 	static private int edgeId = 0;
 	
