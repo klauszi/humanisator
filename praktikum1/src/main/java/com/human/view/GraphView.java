@@ -217,11 +217,15 @@ public class GraphView extends JFrame{
 
         String[] nodeNames = this.graph.realNodes().map(n -> (String) n.getAttribute("ui.label")).toArray(String[]::new);;
 
-        alg1.add(new Label("Source"));
+        Label sourceLabel = new Label("Source");
+        sourceLabel.setBackground(Color.RED);
+        alg1.add(sourceLabel);
         source = new JComboBox();
         alg1.add(source);
 
-        alg1.add(new Label("Target"));
+        Label targetLabel = new Label("Target");
+        targetLabel.setBackground(Color.GREEN);
+        alg1.add(targetLabel);
         target = new JComboBox();
         alg1.add(target);
 

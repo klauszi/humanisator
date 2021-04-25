@@ -51,10 +51,10 @@ public class GraphController implements ActionListener{
 			start();
 		}
 		else if (clickedComponent == view.getTarget()) {
-			target();
+			this.updateSSSP();
 		}
 		else if (clickedComponent == view.getSource()) {
-			source();
+			this.updateSSSP();
 		}
 		else {
 			System.out.println("error event");
@@ -90,18 +90,11 @@ public class GraphController implements ActionListener{
 	/**
 	 * Aktualisert den Zielknoten  und färbt diesen entsprechend.
 	 */
-	public void target() {
+	public void updateSSSP() {
+		String sourceId = (String) view.getSource().getSelectedItem();
 		String targetId = (String) view.getTarget().getSelectedItem();
 		view.uncolorEdges();
 		view.setTargetNode(targetId);
-	}
-
-	/**
-	 * Aktualisert die Quelle und färbt diesen entsprechend.
-	 */
-	public void source() {
-		String sourceId = (String) view.getSource().getSelectedItem();
-		view.uncolorEdges();
 		view.setSourceNode(sourceId);
 	}
 	
