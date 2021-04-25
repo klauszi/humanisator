@@ -35,15 +35,14 @@ public class OwnGraph extends MultiGraph {
 	private Pattern nodePattern = Pattern.compile(NODEREG);
 	private Pattern edgePattern = Pattern.compile(EDGEREG);
 	
+	// Falls kein Kantennehmen, dann Id zuweisen.
 	static private int edgeId = 0;
 	
 	// EmptyNode, um Zusammenhängigkeit  zu garantieren
 	// wegen Design
 	private OwnNode emptyNode;
 
-	// Instanziierung mithilfe vom Konstruktor wird vermieden,
-	// um ungünstige Überladung zu vermeiden.
-	private OwnGraph(String id) {
+	public OwnGraph(String id) {
 		super(id);
 
 		// Neuen Knotentypen OwnNode erzwingen 

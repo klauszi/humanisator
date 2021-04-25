@@ -43,13 +43,18 @@ public class GraphView extends JFrame{
 	private final String GRAPHSTYLE = "graph.css";
 	private JMenuItem loadItem, saveItem;
 	private Button start;
-	private Label numberEdges;
+	private Label numberEdges, fileName;
 	private JPanel gmod, alg, panel;
 	private JMenuBar menuBar;
 	private OwnGraph graph;
 	private View view;
 	private JComboBox source, target;
 	private OwnNode targetNode, sourceNode;
+
+	public void setFileName(String name) {
+		fileName.setText(name);
+	}
+
 
 	public Label getNumberEdges() {
 		return numberEdges;
@@ -88,10 +93,11 @@ public class GraphView extends JFrame{
         GraphController controller = new GraphController(this, this.graph);
         submitToController(controller);
         
+        fileName = new Label(this.graph.getId());
         
-        panel = new JPanel();  
+        panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        panel.add(new Label("Graph 01"), BorderLayout.NORTH);
+        panel.add(fileName, BorderLayout.NORTH);
         //panel.add(gmod, BorderLayout.WEST);
         panel.add(alg, BorderLayout.EAST);
         this.add(panel);

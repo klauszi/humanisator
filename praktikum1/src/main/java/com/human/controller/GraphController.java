@@ -23,7 +23,7 @@ import com.human.view.GKAChooser;
 import com.human.view.GraphView;
 
 /**
- * @author ziegert
+ * @author human
  *
  */
 public class GraphController implements ActionListener{
@@ -118,7 +118,9 @@ public class GraphController implements ActionListener{
 			try {
 				writer = new FileWriter(file);
 				writer.write(graph.toString());
-				writer.close();}
+				writer.close();
+            	view.setFileName(file.getName());
+				}
 			catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -136,6 +138,7 @@ public class GraphController implements ActionListener{
             	File file = chooser.getSelectedFile();
             	OwnGraph newGraph = OwnGraph.getInstanceFromFile(file);
             	view.updateGraph(newGraph);
+            	view.setFileName(file.getName());
             	this.graph = newGraph;
             	this.shortestPath = new DijekstraBFS(this.graph);
             }
