@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -65,10 +66,9 @@ public class OwnGraph extends MultiGraph {
 	}
 	
 	/**
-	 * Fügt einen Element abhängig von den gesetzten Attributen und Werten hinzu
-	 * @param graph
-	 * @param attrToValue Attribute und zugehörige Werte
-	 * @return
+	 * Fügt einen Element aus der line Hinzu
+	 * @param line Zeile mit Graphenelement, welches hinzugefügt wird. 
+	 * @return Erfolgreiches Hinzufügen
 	 */
 	public boolean addElementFromLine(String line)
 	{
@@ -76,22 +76,30 @@ public class OwnGraph extends MultiGraph {
 		Matcher edgeMatcher = edgePattern.matcher(line);
 
 		if(edgeMatcher.find()){
-			//Daten aus dem Matcher auslesen
-			String from = edgeMatcher.group("from");
-			String edgeType = edgeMatcher.group("edgeType");
-			String to = edgeMatcher.group("to");
-			String edgeName = edgeMatcher.group("edgeName");
-			String weight = edgeMatcher.group("weight");
+			//Daten, die man braucht 
+			String from, to, edgeName;
+			int weight;
+			boolean directed;
 
-			int weightValue = weight == null? 1 : Integer.valueOf(weight);
-			boolean directed = edgeType.equals("->");
+			//Daten auslesen
+			from = edgeMatcher.group("from");
+			to = edgeMatcher.group("to");
+			edgeName = edgeMatcher.group("edgeName");
+			try {
+				weight = Integer.valueOf(edgeMatcher.group("weight"));
+			}
+			catch(NumberFormatException e){
+				weight = 1;
+			}
+			directed = edgeMatcher.group("edgeType").equals("->");
 
-			Edge edge = this.addEdge(from, to, directed, weightValue);
+			// Kante definieren
+			Edge edge = this.addEdge(from, to, directed, weight);
 			if(edgeName == null) {
-				edge.setAttribute("ui.label", "(" + edge.getId() + ")" + "W" + weightValue);
+				edge.setAttribute("ui.label", "(" + edge.getId() + ")" + "W" + weight);
 			}
 			else {
-				edge.setAttribute("ui.label", edgeName.trim() + "W" + weightValue);
+				edge.setAttribute("ui.label", edgeName.trim() + "W" + weight);
 				edge.setAttribute("hasLabel", true);
 			}
 			return true;
