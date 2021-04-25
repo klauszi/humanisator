@@ -4,7 +4,7 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.implementations.AbstractEdge;
 import org.graphstream.graph.implementations.AbstractNode;
 
-public class OwnEdge extends AbstractEdge implements Edge, IOwnEdge{
+public class OwnEdge extends AbstractEdge implements Edge{
 	private int DEFAULTWEIGHT = 1;
 	
 	public OwnEdge(String id, AbstractNode src, AbstractNode dst, boolean directed) {
