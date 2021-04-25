@@ -24,20 +24,15 @@ import org.graphstream.graph.implementations.AbstractNode;
 
 public class OwnGraph extends MultiGraph {
 	
-	static String NODEREG = "^([\\w�]+);$";
-	static String EDGEREG = "^([\\w�]+) (->||--) ([\\w�]+)( \\(([\\w�]+)\\))?( : (\\d+))?;$";
+	static String NODEREG = "^(?<nodeName>[\\w�]+);$";
+	static String EDGEREG = "^(?<from>[\\w�]+) "
+			+ "(?<edgeType>->||--) "
+			+ "(?<to>[\\w�]+)"
+			+ "(?<edgeName> \\(([\\w�]+)\\))?"
+			+ "( : (?<weight>\\d+))?;$";
 
 	static Pattern nodePattern = Pattern.compile(NODEREG);
 	static Pattern edgePattern = Pattern.compile(EDGEREG);
-	
-	// Gibt für ein Attribut die entsprechende GroupId der Pattern zum Nachschlagen zurück.  
-	static Map<String, Integer> ATTR2GROUP = Stream.of(new Object[][] {
-		{"from", 1},
-		{"edgeType", 2},
-		{"to", 3},
-		{"edgeName", 5},
-		{"weight", 7},
-	}).collect(Collectors.toMap(data -> (String) data[0], data -> (Integer) data[1]));
 	
 	static private int edgeId = 0;
 	
@@ -69,64 +64,30 @@ public class OwnGraph extends MultiGraph {
 		emptyNode.setAttribute("ui.hide");
 	}
 	
-
-	/**
-	 * Liest eine Zeile. Liefert ein Map zurück, der für jedes Attribut den
-	 * entsprechend gelesenen Wert angibt. Falls die Zeile nicht zum Pattern passt,
-	 * wird ein leeres Map zurückgegeben.
-	 * @param line
-	 * @return Attribute
-	 */
-	static private Map<String, String> readValuesFromLine(String line){
-		Matcher nodeMatcher = nodePattern.matcher(line);
-		Matcher edgeMatcher = edgePattern.matcher(line);
-		Map<String, String>	attr =  new HashMap<String, String>();
-
-		if(edgeMatcher.find()) {
-			attr = ATTR2GROUP.keySet()
-					.stream()
-					.collect(Collectors.toMap(
-						key -> key,
-						key -> (String) Optional.ofNullable(edgeMatcher.group(ATTR2GROUP.get(key))).orElse("null")));
-		}
-		else if(nodeMatcher.find()) {
-			String key = "from";
-			String nodeName = nodeMatcher.group(ATTR2GROUP.get(key));
-			attr.put(key, nodeName);
-		}
-		return attr;
-	}
-	
 	/**
 	 * Fügt einen Element abhängig von den gesetzten Attributen und Werten hinzu
 	 * @param graph
 	 * @param attrToValue Attribute und zugehörige Werte
 	 * @return
 	 */
-	static private boolean addElement(OwnGraph graph, Map<String, String> attrToValue)
+	public boolean addElementFromLine(String line)
 	{
-		//gültige Keys
-		Set<String> EdgeKeys = ATTR2GROUP.keySet();
-		Set<String> NodeKeys = new HashSet<String>(Arrays.asList("from"));
-		
-		//Überprüfung auf Gültigkeit
-		boolean validEdgeKeys = attrToValue.keySet().equals(ATTR2GROUP.keySet());
-		boolean validNodeKeys = attrToValue.keySet().equals(NodeKeys);
-		
-		
-		if(validEdgeKeys){
-			//Daten aus der Map auslesen
-			String from = attrToValue.get("from");
-			String edgeType = attrToValue.get("edgeType");
-			String to = attrToValue.get("to");
-			String edgeName = attrToValue.get("edgeName");
-			String weight = attrToValue.get("weight");
+		Matcher nodeMatcher = nodePattern.matcher(line);
+		Matcher edgeMatcher = edgePattern.matcher(line);
 
-			int weightValue = weight == "null"? 1 : Integer.valueOf(weight);
+		if(edgeMatcher.find()){
+			//Daten aus dem Matcher auslesen
+			String from = edgeMatcher.group("from");
+			String edgeType = edgeMatcher.group("edgeType");
+			String to = edgeMatcher.group("to");
+			String edgeName = edgeMatcher.group("edgeName");
+			String weight = edgeMatcher.group("weight");
+
+			int weightValue = weight == null? 1 : Integer.valueOf(weight);
 			boolean directed = edgeType.equals("->");
 
-			Edge edge = graph.addEdge(from, to, directed, weightValue);
-			if(edgeName == "null") {
+			Edge edge = this.addEdge(from, to, directed, weightValue);
+			if(edgeName == null) {
 				edge.setAttribute("ui.label", "(" + edge.getId() + ")" + "W" + weightValue);
 			}
 			else {
@@ -135,9 +96,9 @@ public class OwnGraph extends MultiGraph {
 			}
 			return true;
 		}
-		else if(validNodeKeys) {
-			String nodeName = attrToValue.get("from");
-			graph.addNode(nodeName);
+		else if(nodeMatcher.find()) {
+			String nodeName = nodeMatcher.group("nodeName");
+			this.addNode(nodeName);
 			return true;
 		}
 		else {
@@ -153,8 +114,7 @@ public class OwnGraph extends MultiGraph {
 			Scanner in = new Scanner(file);
 			while(in.hasNext()) {
 				String line = in.nextLine();
-				Map<String, String> attrToValues = readValuesFromLine(line);
-				boolean succeed = addElement(graph, attrToValues);
+				boolean succeed = graph.addElementFromLine(line);
 				if(!succeed){
 					System.out.println("no match: " + line);
 				}
