@@ -6,18 +6,25 @@ import org.graphstream.graph.implementations.AbstractNode;
 
 public class OwnEdge extends AbstractEdge implements Edge{
 	private int DEFAULTWEIGHT = 1;
+	private int weight;
 	
 	public OwnEdge(String id, AbstractNode src, AbstractNode dst, boolean directed) {
 		super(id, src, dst, directed);
-		this.setAttribute("weight", DEFAULTWEIGHT);
-		this.setAttribute("hasLabel", false);
+		this.weight = DEFAULTWEIGHT;
 	}
 	
+	public int getWeight() {
+		return weight;
+	}
+
+	public void setWeight(int weight) {
+		this.weight = weight;
+	}
+
 	@Override
 	public String toString() {
 		
 		// Alle Metadaten zum Spezifieren einer Kante 
-		int weight = (int) this.getAttribute("weight");
 		String label = (String) this.getAttribute("ui.label");
 		String sourceName = this.getSourceNode().getId();
 		String targetName = this.getTargetNode().getId();

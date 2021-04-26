@@ -25,7 +25,7 @@ public class DijekstraBFS extends BFS implements ShortestPath{
 
 		int oldValue = (int) visitedNode.getAttribute(DIST);
 		int preValue = (int) source.getAttribute(DIST);
-		int weight = (int) usedEdge.getAttribute("weight");
+		int weight = (int) usedEdge.getWeight();
 		
 		// Relaxieren
 		if(oldValue > preValue + weight) {

@@ -156,8 +156,8 @@ public class OwnGraph extends MultiGraph {
 		OwnNode source, target;
 		source = this.addNode(from);
 		target = this.addNode(to);
-		OwnEdge edge = (OwnEdge) addEdge(String.valueOf(edgeId), source, target, directed);
-		edge.setAttribute("weight", weight);
+		OwnEdge edge = (OwnEdge) super.addEdge(String.valueOf(edgeId), source, target, directed);
+		edge.setWeight(weight);
 		edgeId += 1;
 		return edge;
 	}

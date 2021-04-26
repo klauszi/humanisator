@@ -188,9 +188,9 @@ public class GraphView extends JFrame{
 		viewer.enableAutoLayout();
         this.setJMenuBar(menuBar);
         this.setVisible(true);
-        OptionalInt maxWeight = this.graph.edges().mapToInt(e -> (int) e.getAttribute("weight")).max();
-        this.graph.edges()
-        	.forEach(e -> {double weight = Double.valueOf((int) e.getAttribute("weight"));
+        OptionalInt maxWeight = this.graph.realEdges().mapToInt(e -> e.getWeight()).max();
+        this.graph.realEdges()
+        	.forEach(e -> {double weight = Double.valueOf(e.getWeight());
         				  double thick = 10 * (weight / maxWeight.orElse(1));
         				  e.setAttribute("ui.size", String.valueOf(thick) + "px");});
         
