@@ -50,8 +50,6 @@ public class TestDijekstraBFS {
 		OwnNode start = (OwnNode) simpleGraph.getNode("n1");
 		OwnNode target = (OwnNode) simpleGraph.getNode("n3");
 		SSSP.run(start);
-		SSSP.getShortestPath(target).getEdgePath().stream().forEach(System.out::println);
-		System.out.println(SSSP.getShortestPathValue(target));
 	}
 
 }
