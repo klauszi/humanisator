@@ -93,13 +93,13 @@ public class OwnGraph extends MultiGraph {
 			directed = edgeMatcher.group("edgeType").equals("->");
 
 			// Kante definieren
-			Edge edge = this.addEdge(from, to, directed, weight);
+			OwnEdge edge = this.addEdge(from, to, directed, weight);
 			if(edgeName == null) {
 				edge.setAttribute("ui.label", "(" + edge.getId() + ")" + "W" + weight);
 			}
 			else {
 				edge.setAttribute("ui.label", edgeName.trim() + "W" + weight);
-				edge.setAttribute("hasLabel", true);
+				edge.setName(edgeName.trim());
 			}
 			return true;
 		}
