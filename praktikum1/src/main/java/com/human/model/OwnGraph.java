@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -93,15 +94,21 @@ public class OwnGraph extends MultiGraph {
 			directed = edgeMatcher.group("edgeType").equals("->");
 
 			// Kante definieren
-			OwnEdge edge = this.addEdge(from, to, directed, weight);
-			if(edgeName == null) {
-				edge.setAttribute("ui.label", "(" + edge.getId() + ")" + "W" + weight);
+			boolean hasNewEdge = this.addEdge(from, to, directed, weight);
+			if(hasNewEdge) {
+				OwnEdge edge = (OwnEdge) this.getEdge(String.valueOf(edgeId));
+				if(edgeName == null) {
+					edge.setAttribute("ui.label", "(" + edge.getId() + ")" + "W" + weight);
+				}
+				else {
+					edge.setAttribute("ui.label", edgeName.trim() + "W" + weight);
+					edge.setName(edgeName.trim());
+				}
+				return true;
 			}
 			else {
-				edge.setAttribute("ui.label", edgeName.trim() + "W" + weight);
-				edge.setName(edgeName.trim());
+				return false;
 			}
-			return true;
 		}
 		else if(nodeMatcher.find()) {
 			String nodeName = nodeMatcher.group("nodeName");
@@ -143,7 +150,8 @@ public class OwnGraph extends MultiGraph {
 		OwnNode node = getNode(id);
 		if(node == null) {
 			node = (OwnNode) super.addNode(id);
-			Edge edge = addEdge(node.getId(), emptyNode.getId(), false, 0);
+			addEdge(node.getId(), emptyNode.getId(), false, 0);
+			OwnEdge edge = (OwnEdge) this.getEdge(String.valueOf(edgeId));
 			edge.setAttribute("ui.hide");
 			}
 		else {
@@ -152,14 +160,23 @@ public class OwnGraph extends MultiGraph {
 		return node;
 	}
 	
-	public OwnEdge addEdge(String from, String to, boolean directed, int weight) {
+	public boolean addEdge(String from, String to, boolean directed, int weight) {
 		OwnNode source, target;
 		source = this.addNode(from);
 		target = this.addNode(to);
-		OwnEdge edge = (OwnEdge) super.addEdge(String.valueOf(edgeId), source, target, directed);
-		edge.setWeight(weight);
-		edgeId += 1;
-		return edge;
+		List<OwnEdge> edges = source.realEdges()
+							.filter(e -> e.getOpposite(source).equals(target))
+							.collect(Collectors.toList());
+		// Eine Mehrfachkante nur dann erlauben, wenn diese gerichtet ist.
+		if(edges.isEmpty() || directed) {
+			edgeId += 1;
+			OwnEdge edge = (OwnEdge) super.addEdge(String.valueOf(edgeId), source, target, directed);
+			edge.setWeight(weight);
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	
 	//nodes() braucht man für Visualisierung. Daher eigenen Stream für Verarbeitung

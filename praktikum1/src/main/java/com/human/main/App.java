@@ -13,7 +13,7 @@ public class App {
 	
 	public static File exampleGraph() {
 		File file = new File("");
-		String fileName = "graph03.gka";
+		String fileName = "graph11.gka";
 		try {
 		    ClassLoader classLoader = App.class.getClassLoader();
 		    file = new File(classLoader.getResource(fileName).getFile());
