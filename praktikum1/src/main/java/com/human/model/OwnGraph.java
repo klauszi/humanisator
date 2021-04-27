@@ -26,11 +26,11 @@ import org.graphstream.graph.implementations.AbstractNode;
 
 public class OwnGraph extends MultiGraph {
 	
-	private String NODEREG = "^(?<nodeName>[\\w�]+);$";
-	private String EDGEREG = "^(?<from>[\\w�]+) "
+	private String NODEREG = "^(?<nodeName>[\\wäüö]+);$";
+	private String EDGEREG = "^(?<from>[\\wäüö]+) "
 			+ "(?<edgeType>->||--) "
-			+ "(?<to>[\\w�]+)"
-			+ "(?<edgeName> \\(([\\w�]+)\\))?"
+			+ "(?<to>[\\wäüö]+)"
+			+ "(?<edgeName> \\(([\\wäüö]+)\\))?"
 			+ "( : (?<weight>\\d+))?;$";
 
 	private Pattern nodePattern = Pattern.compile(NODEREG);
@@ -125,7 +125,7 @@ public class OwnGraph extends MultiGraph {
 		String fileName = file.getName();
 		OwnGraph graph = new OwnGraph(fileName);
 		try{
-			Scanner in = new Scanner(file);
+			Scanner in = new Scanner(file, "windows-1252");
 			while(in.hasNext()) {
 				String line = in.nextLine();
 				boolean succeed = graph.addElementFromLine(line);
